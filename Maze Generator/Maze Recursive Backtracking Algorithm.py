@@ -1,8 +1,7 @@
 from PIL import Image, ImageGrab
 import tkinter
 import random
-import subprocess
-import io
+import time
 
 class Cell:
     """A class to model a Cell"""
@@ -19,23 +18,23 @@ class Cell:
         y = self.j*cell_size
 
         if self.is_visited:
-            canvas.create_rectangle(x, y, x + cell_size, y + cell_size, fill='brown', outline="")
+            canvas.create_rectangle(x, y, x + cell_size, y + cell_size, fill='white', outline="")
 
         if self.walls[0]:
-            canvas.create_line( x            , y            , x + cell_size, y            , fill='white')
+            canvas.create_line( x            , y            , x + cell_size, y            , fill='black')
         if self.walls[1]:
-            canvas.create_line( x + cell_size, y            , x + cell_size, y + cell_size, fill='white')
+            canvas.create_line( x + cell_size, y            , x + cell_size, y + cell_size, fill='black')
         if self.walls[2]:
-            canvas.create_line( x + cell_size, y + cell_size, x            , y + cell_size, fill='white')
+            canvas.create_line( x + cell_size, y + cell_size, x            , y + cell_size, fill='black')
         if self.walls[3]:
-            canvas.create_line( x            , y + cell_size, x            , y            , fill='white')
+            canvas.create_line( x            , y + cell_size, x            , y            , fill='black')
 
     def highlight(self, canvas):
         x = self.i*cell_size
         y = self.j*cell_size
 
         if self.is_visited:
-            canvas.create_rectangle(x, y, x + cell_size, y + cell_size, fill='red', outline="")
+            canvas.create_rectangle(x, y, x + cell_size, y + cell_size, fill='green', outline="")
 
     def check_neighbors(self, grid):
         neighbors = []
@@ -83,6 +82,15 @@ def remove_walls(a, b):
         a.walls[2] = False
         b.walls[0] = False
 
+def show_last(grid, canvas):
+    global cell_size
+    r = cell_size/4
+    f_x = grid[0].i*cell_size + r
+    f_y = grid[0].j*cell_size + r
+    l_x = grid[-1].i*cell_size + r
+    l_y = grid[-1].j*cell_size + r
+    canvas.create_oval(f_x, f_y, f_x + cell_size - 2*r, f_y + cell_size - 2*r,fill="red")
+    canvas.create_oval(l_x, l_y, l_x + cell_size - 2*r, l_y + cell_size - 2*r, fill="green")
 
 def setup():
     for j in range(columns):
@@ -100,6 +108,7 @@ grid = []
 stack = []
 k = 0
 make = True
+start_time = time.time()
 
 # Create the tkinter window and canvas
 sim_window = tkinter.Tk()
@@ -114,41 +123,61 @@ current = grid[0]
 stack.append(current)
 
 # Run the simulation
-while make :
+print("Generating Maze.....")
+if input("do you wanna see The Simulation (y/n): ") == 'y':
+    while len(stack) != 0 :
+        # Show
+        for i in range(len(grid)):
+            grid[i].show(sim_canvas)
+
+        current.is_visited = True
+        current.highlight(sim_canvas)
+
+        # STEP 1
+        Next = current.check_neighbors(grid)
+        if Next:
+            # STEP 2
+            stack.append(current)
+            Next.is_visited = True
+
+            # STEP 3
+            remove_walls(current, Next)
+
+            # STEP 4
+            current = Next
+        else:
+            current = stack.pop()
+
+
+        # Update tkinter window
+        sim_window.update()
+        #sim_window.after(100)
+
+        # wipe the canvas clean
+        if len(stack) != 0:
+            sim_canvas.delete('all')
+else:
+    while len(stack) != 0:
+        current.is_visited = True
+        # STEP 1
+        Next = current.check_neighbors(grid)
+        if Next:
+            # STEP 2
+            stack.append(current)
+            Next.is_visited = True
+
+            # STEP 3
+            remove_walls(current, Next)
+
+            # STEP 4
+            current = Next
+        else:
+            current = stack.pop()
+
     # Show
-    # STEP 1
-    current.is_visited = True
     for i in range(len(grid)):
         grid[i].show(sim_canvas)
 
-    # STEP 2
-    Next = current.check_neighbors(grid)
-    current.highlight(sim_canvas)
-
-    if Next:
-        stack.append(current)
-        Next.is_visited = True
-
-        # STEP 3
-        remove_walls(current, Next)
-
-        # STEP 4
-        current = Next
-    else:
-        #go_back(stack)
-        if len(stack) == 0:
-            make = False
-
-        else:
-            current = stack.pop()
-            current.is_visited = True
-
-    # Update tkinter window
-    sim_window.update()
-    #sim_window.after(100)
-
-    # wipe the canvas clean
-    if make:
-        sim_canvas.delete('all')
-
+show_last(grid, sim_canvas)
+print("Generation Time: %s seconds" % round((time.time() - start_time),3))
 sim_window.mainloop()
