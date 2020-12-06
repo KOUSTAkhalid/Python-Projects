@@ -232,6 +232,9 @@ new_mice = []
 # Highlight the goal
 goal.show_goal(sim_canvas)
 
+# Show start position
+mice[0].show_mouse(sim_canvas)
+
 # Update tkinter window
 sim_window.update()
 
