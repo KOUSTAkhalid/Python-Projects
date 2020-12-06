@@ -214,6 +214,15 @@ def is_win(m, g):
 mice = [Mouse(grid[0])]
 mice[0].stack.append(grid[0])
 grid[0].is_visited = True
+
+# If you want to start in a random position incomment this ana comment the last 3 lines
+"""
+randd = random.choice(grid)
+mice = [Mouse(randd)]
+mice[0].stack.append(randd)
+randd.is_visited = True
+"""
+
 goal = Goal()
 stack = []
 GAME = False
