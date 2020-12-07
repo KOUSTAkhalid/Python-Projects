@@ -1,3 +1,5 @@
+"""This script is made by khalid kousta""""
+
 import tkinter
 import random
 import time
@@ -70,7 +72,7 @@ def setup_grid():
 
 
 # Set constant variables for window size
-WINDOW_SIZE = 400
+WINDOW_SIZE = 600
 cell_size = 20
 columns = int(WINDOW_SIZE / cell_size)
 rows = int(WINDOW_SIZE / cell_size)
@@ -211,28 +213,19 @@ def is_win(m, g):
         return False
 
 # Initialize Solving parameters
-mice = [Mouse(grid[0])]
-mice[0].stack.append(grid[0])
-grid[0].is_visited = True
-
-# If you want to start in a random position incomment this ana comment the last 3 lines
-"""
 randd = random.choice(grid)
 mice = [Mouse(randd)]
 mice[0].stack.append(randd)
 randd.is_visited = True
-"""
-
 goal = Goal()
 stack = []
 GAME = False
 
 new_mice = []
+old_mice = []
 
 # Highlight the goal
 goal.show_goal(sim_canvas)
-
-# Show start position
 mice[0].show_mouse(sim_canvas)
 
 # Update tkinter window
@@ -296,10 +289,10 @@ if input("do you wanna see The Simulation (y/n): ") == 'y':
                 # delete old mouse, and mark cell as visited
                 mouse.visible = False
 
-        mice.extend(new_mice)
+            # Update tkinter window
+            sim_window.update()
 
-        # Show mice
-        for mouse in mice:
+            # Show mice
             mouse.show_mouse(sim_canvas)
             # Check if reached
             GAME = is_win(mouse, goal)
@@ -307,11 +300,23 @@ if input("do you wanna see The Simulation (y/n): ") == 'y':
                 winner = mouse
                 break
 
+            # save hidden mice to a list
+            if not mouse.visible:
+                old_mice.append(mice.index(mouse))
+        
+        """ We need to delete old mice everytimeto make the process faster"""
+        # delete hidden mice
+        del mice[:len(old_mice)]
+        old_mice = []
+
+
+        mice.extend(new_mice)
+
         # simulation speed
-        sim_window.after(50)
+        #sim_window.after(50)
 
         # Update tkinter window
-        sim_window.update()
+        #sim_window.update()
 
 else:
     start_time = time.time()
