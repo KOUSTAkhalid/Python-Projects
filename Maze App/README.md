@@ -1,0 +1,1 @@
+The Maze generator system is a desktop application. It was developed using Python for programming with Tkinter module. This application is a maze generation application, which Implement different algorithms such as BFS and DFS algorithms, with this App you can generate and solve a maze in a short amount of time so you can use it in your projects.
