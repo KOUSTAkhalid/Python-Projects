@@ -1,0 +1,1 @@
+A motion detection system in a static background, using computer vision techniques such as foreground detection, background substruction. This system can be used for object segmentation and object tracking.
